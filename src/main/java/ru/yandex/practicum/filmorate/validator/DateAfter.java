@@ -6,10 +6,13 @@ import java.lang.annotation.*;
 
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = FilmReleaseDateValidator.class)
+@Constraint(validatedBy = AfterDateValidator.class)
 @Documented
-public @interface CinemaDate {
-    String message() default "{filmDuration.invalid}";
+public @interface DateAfter {
+
+    String date();
+
+    String message() default "The date is invalid";
 
     Class<?>[] groups() default {};
 

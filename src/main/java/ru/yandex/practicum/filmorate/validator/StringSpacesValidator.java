@@ -6,7 +6,10 @@ import javax.validation.ConstraintValidatorContext;
 public class StringSpacesValidator implements ConstraintValidator<NoSpaces, String> {
     @Override
     public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
-        return !s.contains("\\s");
+        if (!(s == null)) {
+            return !s.contains("\\s");
+        }
+        return true;
     }
 
     @Override

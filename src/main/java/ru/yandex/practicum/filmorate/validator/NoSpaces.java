@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = StringSpacesValidator.class)
 @Documented
 public @interface NoSpaces {
-    String message() default "{noSpaces.invalid}";
+    String message() default "The login is invalid";
 
     Class<?>[] groups() default {};
 
