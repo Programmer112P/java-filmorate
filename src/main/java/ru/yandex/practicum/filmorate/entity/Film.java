@@ -7,10 +7,13 @@ import ru.yandex.practicum.filmorate.validator.DateAfter;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @Builder
 public class Film {
+    @EqualsAndHashCode.Exclude
+    private final Set<Long> usersLike;
     @EqualsAndHashCode.Include
     private long id;
     @NotBlank

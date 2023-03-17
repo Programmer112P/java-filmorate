@@ -34,4 +34,12 @@ public class UserRepository {
         storage.put(updatedUser.getId(), updatedUser);
         return Optional.of(updatedUser);
     }
+
+    public Optional<User> getUserById(long id) {
+        User user = storage.get(id);
+        if (user == null) {
+            return Optional.empty();
+        }
+        return Optional.of(user);
+    }
 }

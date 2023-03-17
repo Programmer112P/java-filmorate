@@ -17,6 +17,20 @@ public class UserServiceImpl implements UserService {
     private final UserDao userDao;
 
     @Override
+    public User getById(long id) {
+        log.info("Запрос на получение user с ID {} в сервисном слое", id);
+        try {
+            User user =  userDao.getById(id);
+            log.info("User {} получен в сервисном слое", user);
+            return user;
+        } catch (DAOException e) {
+            log.error("User с id {} не существует в сервисном слое", id);
+            throw new ServiceException(String.format("User с ID %s не найден в сервисном слое", id), e);
+        }
+
+    }
+
+    @Override
     public List<User> getAll() {
         log.info("Получен список всех user в сервисном слое");
         return userDao.getAll();
@@ -33,9 +47,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public User update(final User user) {
         try {
-            log.info("User с id {} обновлется в сервисном слое", user);
+            log.info("User {} обновлется в сервисном слое", user);
             User updated = userDao.update(user);
-            log.info("User с id {} обновлен в сервисном слое", updated);
+            log.info("User {} обновлен в сервисном слое", updated);
             return updated;
         } catch (DAOException ex) {
             log.error("User с id {} не существует в сервисном слое", user.getId());

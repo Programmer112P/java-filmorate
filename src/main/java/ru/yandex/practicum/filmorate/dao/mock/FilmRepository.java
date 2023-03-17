@@ -10,6 +10,14 @@ public class FilmRepository {
     private final Map<Long, Film> storage = new HashMap<>();
     private long generatorId = 1;
 
+    public Optional<Film> getFilmById(long id) {
+        Film film = storage.get(id);
+        if (film == null) {
+            return Optional.empty();
+        }
+        return Optional.of(film);
+    }
+
     public List<Film> getAllFilms() {
         return new ArrayList<>(storage.values());
     }

@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface UserService {
 
+    User getById(long id);
+
     List<User> getAll();
 
     User create(final User user);

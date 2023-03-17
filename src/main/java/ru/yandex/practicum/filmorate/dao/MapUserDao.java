@@ -35,10 +35,23 @@ public class MapUserDao implements UserDao {
         log.info("User {} обновляется в DAO", user);
         Optional<User> optional = repository.updateUser(user);
         if (optional.isEmpty()) {
-            log.error("User с id {} не существует в DAO", user.getId());
+            log.error("User с id {} не существует в Storage", user.getId());
             throw new DAOException(String.format("User с id %s не существует", user.getId()));
         }
         log.info("User {} обновлен в DAO", user);
         return optional.get();
+    }
+
+    @Override
+    public User getById(long id) {
+        log.info("Запрос на получение User с ID {} в DAO", id);
+        Optional<User> optional = repository.getUserById(id);
+        if (optional.isEmpty()) {
+            log.error("User с id {} не существует в DAO", id);
+            throw new DAOException(String.format("User с id %d не существует в Storage", id));
+        }
+        User user = optional.get();
+        log.info("User {} получен в DAO", user);
+        return user;
     }
 }

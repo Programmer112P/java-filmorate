@@ -17,6 +17,19 @@ public class MapFilmDao implements FilmDao {
     private final FilmRepository repository;
 
     @Override
+    public Film getById(long id) {
+        log.info("Запрос на получение фильма с ID {} в DAO", id);
+        Optional<Film> optional = repository.getFilmById(id);
+        if (optional.isEmpty()) {
+            log.error("Фильма с id {} не существует в Storage", id);
+            throw new DAOException(String.format("Фильма с id %s не существует в Storage", id));
+        }
+        Film film = optional.get();
+        log.info("Получен фильм{} в DAO", film);
+        return film;
+    }
+
+    @Override
     public List<Film> getAll() {
         log.info("Список фильмов получен из DAO");
         return repository.getAllFilms();
@@ -35,8 +48,8 @@ public class MapFilmDao implements FilmDao {
         log.info("Фильм {} обновляется в DAO", film);
         Optional<Film> optional = repository.updateFilm(film);
         if (optional.isEmpty()) {
-            log.error("Фильма с id {} не существует в DAO", film.getId());
-            throw new DAOException(String.format("Фильма с id %s не существует", film.getId()));
+            log.error("Фильма с id {} не существует в Storage", film.getId());
+            throw new DAOException(String.format("Фильма с id %s не существует в Storage", film.getId()));
         }
         Film updated = optional.get();
         log.info("Фильм {} обновлен в DAO", updated);
