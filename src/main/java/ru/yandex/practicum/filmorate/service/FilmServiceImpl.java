@@ -10,10 +10,6 @@ import ru.yandex.practicum.filmorate.exception.ServiceException;
 
 import java.util.List;
 
-//Нет никакой бизнес-логики, поэтому использование интерфейса вылядит странным
-//Но, наверное, в реальном проекте надо писать какую-то базовую реализацию, а от нее уже наследоваться при расширении
-//Вроде того, как мы делали менеджеры
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -21,9 +17,24 @@ public class FilmServiceImpl implements FilmService {
     private final FilmDao filmDao;
 
     @Override
+    public Film getById(long id) {
+        log.info("Запрос на получение фильма с ID {} в сервисном слое", id);
+        try {
+            Film film = filmDao.getById(id);
+            log.info("Получен фильм {} в сервисном слое", film);
+            return film;
+        } catch (DAOException ex) {
+            log.error("Фильма с id {} не существует в DAO слое", id);
+            throw new ServiceException(String.format("Фильма с id %d не существует в DAO слое", id), ex);
+        }
+    }
+
+    @Override
     public List<Film> getAll() {
-        log.info("Список фильмов получен в сервисном слое");
-        return filmDao.getAll();
+        log.info("Запрос на получение всех фильмов в сервисном слое");
+        List<Film> list = filmDao.getAll();
+        log.info("Получены все фильмы в сервисном слое");
+        return list;
     }
 
     @Override
@@ -42,7 +53,7 @@ public class FilmServiceImpl implements FilmService {
             log.info("Фильм {} обновлен в сервисном слое", updated);
             return updated;
         } catch (DAOException ex) {
-            log.error("Фильма с id {} не существует в сервисном слое", film.getId());
+            log.error("Фильма с id {} не существует в DAO слое", film.getId());
             throw new ServiceException((String.format("Фильма с id %s не существует", film.getId())), ex);
         }
     }

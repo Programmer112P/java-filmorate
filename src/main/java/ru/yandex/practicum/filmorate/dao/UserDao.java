@@ -8,6 +8,8 @@ public interface UserDao {
     //read
     List<User> getAll();
 
+    User getById(long id);
+
     //create
     User create(final User user);
 

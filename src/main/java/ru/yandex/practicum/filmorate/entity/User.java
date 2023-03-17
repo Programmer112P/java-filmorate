@@ -7,10 +7,13 @@ import ru.yandex.practicum.filmorate.validator.NoSpaces;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @Builder
 public class User {
+    @EqualsAndHashCode.Exclude
+    private final Set<Long> friends;
     @EqualsAndHashCode.Include
     private long id;
     @Email
