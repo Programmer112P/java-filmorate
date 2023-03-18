@@ -7,13 +7,14 @@ import ru.yandex.practicum.filmorate.validator.DateAfter;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
 @Builder
 public class Film {
     @EqualsAndHashCode.Exclude
-    private final Set<Long> usersLike;
+    private final Set<Long> usersLike = new HashSet<>();//Почему это поле не создается в @Data????
     @EqualsAndHashCode.Include
     private long id;
     @NotBlank
@@ -30,4 +31,12 @@ public class Film {
     @NotNull
     @EqualsAndHashCode.Exclude
     private long duration;
+
+    public boolean addLike(long userId) {
+        return usersLike.add(userId);
+    }
+
+    public boolean removeLike(long userId) {
+        return usersLike.remove(userId);
+    }
 }

@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.dao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.dao.mock.UserRepository;
+import ru.yandex.practicum.filmorate.dao.mock.InMemoryUserRepository;
 import ru.yandex.practicum.filmorate.entity.User;
 import ru.yandex.practicum.filmorate.exception.DAOException;
 
@@ -13,13 +13,27 @@ import java.util.Optional;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class MapUserDao implements UserDao {
-    private final UserRepository repository;
+public class InMemoryUserDao implements UserDao {
+    private final InMemoryUserRepository repository;
+
+    @Override
+    public List<User> getListOfIds(List<Long> ids) {
+        log.info("Запрос на получение списка Users по id из DAO");
+        Optional<List<User>> optional = repository.getList(ids);
+        if (optional.isEmpty()) {
+            log.error("Одного из пользователей списка нет в репозитории");
+            throw new DAOException("Одного из пользователей списка нет в репозитории");
+        }
+        log.info("Список Users получен в DAO");
+        return optional.get();
+    }
 
     @Override
     public List<User> getAll() {
+        log.info("Запрос на получение списка пользователей из DAO");
+        List<User> users = repository.getAllUsers();
         log.info("Список пользователей получен из DAO");
-        return repository.getAllUsers();
+        return users;
     }
 
     @Override
@@ -35,8 +49,8 @@ public class MapUserDao implements UserDao {
         log.info("User {} обновляется в DAO", user);
         Optional<User> optional = repository.updateUser(user);
         if (optional.isEmpty()) {
-            log.error("User с id {} не существует в Storage", user.getId());
-            throw new DAOException(String.format("User с id %s не существует", user.getId()));
+            log.error("User с id {} не существует в репозитории", user.getId());
+            throw new DAOException(String.format("User с id %s не существует в репозитории", user.getId()));
         }
         log.info("User {} обновлен в DAO", user);
         return optional.get();
@@ -44,14 +58,15 @@ public class MapUserDao implements UserDao {
 
     @Override
     public User getById(long id) {
-        log.info("Запрос на получение User с ID {} в DAO", id);
+        log.info("Запрос на получение User с ID {} в репозитории", id);
         Optional<User> optional = repository.getUserById(id);
         if (optional.isEmpty()) {
             log.error("User с id {} не существует в DAO", id);
-            throw new DAOException(String.format("User с id %d не существует в Storage", id));
+            throw new DAOException(String.format("В репозитории не существует User с id %d", id));
         }
         User user = optional.get();
         log.info("User {} получен в DAO", user);
         return user;
     }
+
 }

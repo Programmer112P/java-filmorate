@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface FilmDao {
 
+    List<Film> getPopular(int count);
+
     Film getById(long id);
 
     List<Film> getAll();

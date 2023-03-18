@@ -7,13 +7,14 @@ import ru.yandex.practicum.filmorate.validator.NoSpaces;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
 @Builder
 public class User {
     @EqualsAndHashCode.Exclude
-    private final Set<Long> friends;
+    private final Set<Long> friends = new HashSet<>();//Почему это поле не создается в @Data????
     @EqualsAndHashCode.Include
     private long id;
     @Email
@@ -29,4 +30,12 @@ public class User {
     @PastOrPresent
     @EqualsAndHashCode.Exclude
     private LocalDate birthday;
+
+    public boolean addFriend(long friendId) {
+        return friends.add(friendId);
+    }
+
+    public boolean removeFriend(long friendId) {
+        return friends.remove(friendId);
+    }
 }

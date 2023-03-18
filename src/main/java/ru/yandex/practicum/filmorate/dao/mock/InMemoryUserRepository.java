@@ -6,7 +6,7 @@ import ru.yandex.practicum.filmorate.entity.User;
 import java.util.*;
 
 @Component
-public class UserRepository {
+public class InMemoryUserRepository {
     private final Map<Long, User> storage = new HashMap<>();
     private long generatorId = 1;
 
@@ -41,5 +41,18 @@ public class UserRepository {
             return Optional.empty();
         }
         return Optional.of(user);
+    }
+
+    //По идее такой запрос реален к БД, где возвращаются значения по условию - пока так реализовал эту возможность тут
+    public Optional<List<User>> getList(List<Long> ids) {
+        List<User> result = new ArrayList<>();
+        for (long id : ids) {
+            User user = storage.get(id);
+            if (user == null) {
+                return Optional.empty();
+            }
+            result.add(user);
+        }
+        return Optional.of(result);
     }
 }

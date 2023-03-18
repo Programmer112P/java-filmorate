@@ -6,7 +6,7 @@ import ru.yandex.practicum.filmorate.entity.Film;
 import java.util.*;
 
 @Component
-public class FilmRepository {
+public class InMemoryFilmRepository {
     private final Map<Long, Film> storage = new HashMap<>();
     private long generatorId = 1;
 
@@ -36,4 +36,5 @@ public class FilmRepository {
         storage.put(updatedFilm.getId(), updatedFilm);
         return Optional.of(updatedFilm);
     }
+
 }

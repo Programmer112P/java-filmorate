@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.*;
 
 @Slf4j
@@ -21,46 +22,82 @@ import java.util.*;
 public class FilmController {
     private final FilmService filmService;
 
+    @GetMapping("/popular")
+    public List<Film> getPopular(@Min(1) @RequestParam(value = "count", required = false, defaultValue = "10") int count) {
+        log.info("FilmController: Запрос на getPopular с count = {}", count);
+        List<Film> films = filmService.getPopular(count);
+        log.info("FilmController: Получен список popularFilms");
+        return films;
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public Film removeLike(@NotNull @PathVariable long id,
+                           @NotNull @PathVariable long userId) {
+        log.info("FilmController: Запрос на removeLike от User с ID {} фильму с ID {}", userId, id);
+        try {
+            Film film = filmService.removeLike(id, userId);
+            log.info("FilmController: удален like от User с ID {} фильму с ID {}", userId, id);
+            return film;
+        } catch (ServiceException e) {
+            log.error("FilmController: Ошибка при removeLike от User с ID {} фильму с ID {} в FilmService", userId, id);
+            throw new NotFoundException("Неверный id фильма или User", e);
+        }
+    }
+
+    @PutMapping("/{id}/like/{userId}")
+    public Film addLike(@NotNull @PathVariable long id,
+                        @NotNull @PathVariable long userId) {
+        log.info("Запрос на like от User с ID {} фильму с ID {} в FilmController", userId, id);
+        try {
+            Film film = filmService.addLike(id, userId);
+            log.info("Поставлен like от User с ID {} фильму с ID {} в FilmController", userId, id);
+            return film;
+        } catch (ServiceException e) {
+            log.error("Ошибка при like от User с ID {} фильму с ID {} в FilmService", userId, id);
+            throw new NotFoundException("Неверный id фильма или User", e);
+        }
+
+    }
+
     @GetMapping
     public List<Film> getAll() {
-        log.info("Запрос на получение списка Фильмов в контроллере");
+        log.info("Запрос на получение списка Фильмов в FilmController");
         List<Film> list = filmService.getAll();
-        log.info("Получен список Films {} в контроллере", list);
+        log.info("Получен список allFilms в FilmController");
         return list;
     }
 
     @GetMapping("/{id}")
     public Film getById(@Min(1) @PathVariable long id) {
-        log.info("Запрос на получение Film c id {} в контроллере", id);
+        log.info("Запрос на получение Film c id {} в FilmController", id);
         try {
             Film film = filmService.getById(id);
-            log.info("Получен Film {} в контроллере", film);
+            log.info("Получен Film {} в FilmController", film);
             return film;
-        } catch (ServiceException ex) {
+        } catch (ServiceException e) {
             log.error("Фильма с id {} не существует в FilmService", id);
-            throw new NotFoundException("Неверный id фильма", ex);
+            throw new NotFoundException("Неверный id фильма", e);
         }
     }
 
-
     @PostMapping
     public Film create(@Valid @RequestBody final Film film) {
-        log.info("Фильм {} создается в контроллере", film);
+        log.info("Фильм {} создается в FilmController", film);
         Film created = filmService.create(film);
-        log.info("Фильм {} создан в контроллере", created);
+        log.info("Фильм {} создан в FilmController", created);
         return created;
     }
 
     @PutMapping
     public Film update(@Valid @RequestBody final Film film) {
         try {
-            log.info("Фильм {} обновляется в контроллере", film);
+            log.info("Фильм {} обновляется в FilmController", film);
             Film updated = filmService.update(film);
-            log.info("Фильм {} обновлен в контроллере", updated);
+            log.info("Фильм {} обновлен в FilmController", updated);
             return updated;
-        } catch (ServiceException ex) {
+        } catch (ServiceException e) {
             log.error("Фильма с id {} не существует в FilmService", film.getId());
-            throw new NotFoundException("Неверный id фильма", ex);
+            throw new NotFoundException("Неверный id фильма", e);
         }
     }
 }

@@ -3,18 +3,34 @@ package ru.yandex.practicum.filmorate.dao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.dao.mock.FilmRepository;
+import ru.yandex.practicum.filmorate.dao.mock.InMemoryFilmRepository;
 import ru.yandex.practicum.filmorate.entity.Film;
 import ru.yandex.practicum.filmorate.exception.DAOException;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class MapFilmDao implements FilmDao {
-    private final FilmRepository repository;
+public class InMemoryFilmDao implements FilmDao {
+    private final InMemoryFilmRepository repository;
+
+    @Override
+    public List<Film> getPopular(int count) {
+        log.info("FilmDao: запрос на получение популярных фильмов");
+        //Не уверен, что это лучшее решение - тащить все фильмы из БД, чтобы выбрать 10 лучших
+        //Но по идее логики в БД не должно быть, должен из DAO приходить правильный запрос
+        //Отбор записей я поместил в DAO, потому что это работа DAO слоя - работать с данными из БД
+        List<Film> films = getAll()
+                .stream()
+                .sorted(((o1, o2) -> o2.getUsersLike().size() - o1.getUsersLike().size()))
+                .limit(count)
+                .collect(Collectors.toList());
+        log.info("FilmDao: получены популярные фильмы");
+        return films;
+    }
 
     @Override
     public Film getById(long id) {
@@ -31,8 +47,10 @@ public class MapFilmDao implements FilmDao {
 
     @Override
     public List<Film> getAll() {
+        log.info("FilmDao: запрос на получение всех фильмов из DAO");
+        List<Film> films = repository.getAllFilms();
         log.info("Список фильмов получен из DAO");
-        return repository.getAllFilms();
+        return films;
     }
 
     @Override
