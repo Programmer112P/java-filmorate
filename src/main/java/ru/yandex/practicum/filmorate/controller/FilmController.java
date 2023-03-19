@@ -5,8 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.entity.Film;
-import ru.yandex.practicum.filmorate.exception.ServiceException;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -34,28 +32,18 @@ public class FilmController {
     public Film removeLike(@NotNull @PathVariable long id,
                            @NotNull @PathVariable long userId) {
         log.info("FilmController: Запрос на removeLike от User с ID {} фильму с ID {}", userId, id);
-        try {
-            Film film = filmService.removeLike(id, userId);
-            log.info("FilmController: удален like от User с ID {} фильму с ID {}", userId, id);
-            return film;
-        } catch (ServiceException e) {
-            log.error("FilmController: Ошибка при removeLike от User с ID {} фильму с ID {} в FilmService", userId, id);
-            throw new NotFoundException("Неверный id фильма или User", e);
-        }
+        Film film = filmService.removeLike(id, userId);
+        log.info("FilmController: удален like от User с ID {} фильму с ID {}", userId, id);
+        return film;
     }
 
     @PutMapping("/{id}/like/{userId}")
     public Film addLike(@NotNull @PathVariable long id,
                         @NotNull @PathVariable long userId) {
         log.info("Запрос на like от User с ID {} фильму с ID {} в FilmController", userId, id);
-        try {
-            Film film = filmService.addLike(id, userId);
-            log.info("Поставлен like от User с ID {} фильму с ID {} в FilmController", userId, id);
-            return film;
-        } catch (ServiceException e) {
-            log.error("Ошибка при like от User с ID {} фильму с ID {} в FilmService", userId, id);
-            throw new NotFoundException("Неверный id фильма или User", e);
-        }
+        Film film = filmService.addLike(id, userId);
+        log.info("Поставлен like от User с ID {} фильму с ID {} в FilmController", userId, id);
+        return film;
 
     }
 
@@ -70,14 +58,9 @@ public class FilmController {
     @GetMapping("/{id}")
     public Film getById(@Min(1) @PathVariable long id) {
         log.info("Запрос на получение Film c id {} в FilmController", id);
-        try {
-            Film film = filmService.getById(id);
-            log.info("Получен Film {} в FilmController", film);
-            return film;
-        } catch (ServiceException e) {
-            log.error("Фильма с id {} не существует в FilmService", id);
-            throw new NotFoundException("Неверный id фильма", e);
-        }
+        Film film = filmService.getById(id);
+        log.info("Получен Film {} в FilmController", film);
+        return film;
     }
 
     @PostMapping
@@ -90,14 +73,9 @@ public class FilmController {
 
     @PutMapping
     public Film update(@Valid @RequestBody final Film film) {
-        try {
-            log.info("Фильм {} обновляется в FilmController", film);
-            Film updated = filmService.update(film);
-            log.info("Фильм {} обновлен в FilmController", updated);
-            return updated;
-        } catch (ServiceException e) {
-            log.error("Фильма с id {} не существует в FilmService", film.getId());
-            throw new NotFoundException("Неверный id фильма", e);
-        }
+        log.info("Фильм {} обновляется в FilmController", film);
+        Film updated = filmService.update(film);
+        log.info("Фильм {} обновлен в FilmController", updated);
+        return updated;
     }
 }

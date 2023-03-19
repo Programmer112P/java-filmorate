@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.UserDao;
 import ru.yandex.practicum.filmorate.entity.User;
 import ru.yandex.practicum.filmorate.exception.DAOException;
-import ru.yandex.practicum.filmorate.exception.ServiceException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
             return commonFriends;
         } catch (DAOException e) {
             log.error("Ошибка при получении списка общих друзей в UserService для user с ID {} и user с ID {}", id, otherId);
-            throw new ServiceException(String.format(
+            throw new NotFoundException(String.format(
                     "Ошибка при получении списка общих друзей в UserService для user с ID %d и user с ID %d", id, otherId), e);
         }
     }
@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
             return friendsList;
         } catch (DAOException e) {
             log.error("Ошибка при получении списка друзей от user с ID {}", id);
-            throw new ServiceException(String.format("Ошибка при получении списка друзей от user с ID %d", id), e);
+            throw new NotFoundException(String.format("Ошибка при получении списка друзей от user с ID %d", id), e);
         }
     }
 
@@ -60,13 +60,13 @@ public class UserServiceImpl implements UserService {
             boolean isUserExist = friend.removeFriend(id);
             if (!isUserExist || !isFriendExist) {
                 log.error("Ошибка при удалении User с ID {} из друзей User с ID {}", friendId, id);
-                throw new ServiceException(String.format("User с ID %d не был другом user с ID %d", id, friendId));
+                throw new NotFoundException(String.format("User с ID %d не был другом user с ID %d", id, friendId));
             }
             log.info("Удален друг с ID {} у user с ID {} ", friendId, id);
             return user;
         } catch (DAOException e) {
             log.error("Ошибка при удалении User с ID {} из друзей User с ID {}", friendId, id);
-            throw new ServiceException(String.format("User с ID %d либо %d не найден в DAO слое", id, friendId), e);
+            throw new NotFoundException(String.format("User с ID %d либо %d не найден в DAO слое", id, friendId), e);
         }
     }
 
@@ -81,7 +81,7 @@ public class UserServiceImpl implements UserService {
             return user;
         } catch (DAOException e) {
             log.error("Ошибка при добавлении User с ID {} в друзья к User с ID {}", friendId, id);
-            throw new ServiceException(String.format("User с ID %d либо %d не найден в DAO слое", id, friendId), e);
+            throw new NotFoundException(String.format("User с ID %d либо %d не найден в DAO слое", id, friendId), e);
         }
     }
 
@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
             return user;
         } catch (DAOException e) {
             log.error("User с id {} не существует в DAO слое", id);
-            throw new ServiceException(String.format("User с ID %s не найден в DAO слое", id), e);
+            throw new NotFoundException(String.format("User с ID %s не найден в DAO слое", id), e);
         }
 
     }
@@ -124,7 +124,7 @@ public class UserServiceImpl implements UserService {
             return updated;
         } catch (DAOException ex) {
             log.error("User с id {} не существует в DAO слое", user.getId());
-            throw new ServiceException((String.format("User с id %s не существует в DAO слое", user.getId())), ex);
+            throw new NotFoundException((String.format("User с id %s не существует в DAO слое", user.getId())), ex);
         }
     }
 }

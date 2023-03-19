@@ -8,9 +8,10 @@ import ru.yandex.practicum.filmorate.dao.UserDao;
 import ru.yandex.practicum.filmorate.entity.Film;
 import ru.yandex.practicum.filmorate.entity.User;
 import ru.yandex.practicum.filmorate.exception.DAOException;
-import ru.yandex.practicum.filmorate.exception.ServiceException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -22,7 +23,11 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public List<Film> getPopular(int count) {
         log.info("FilmService: Запрос на getPopular с count = {}", count);
-        List<Film> films = filmDao.getPopular(count);
+        List<Film> films = getAll()
+                .stream()
+                .sorted(((o1, o2) -> o2.getUsersLike().size() - o1.getUsersLike().size()))
+                .limit(count)
+                .collect(Collectors.toList());
         log.info("FilmService: получены фильмы от getPopular с count = {}", count);
         return films;
     }
@@ -35,14 +40,14 @@ public class FilmServiceImpl implements FilmService {
             boolean isDeletionHappened = film.removeLike(userId);
             if (!isDeletionHappened) {
                 log.error("FilmService: User с ID {} не лайкал фильм с ID {} при removeLike", userId, id);
-                throw new ServiceException(String.format(
+                throw new NotFoundException(String.format(
                         "FilmService: User с ID %d не лайкал фильм с ID %d при removeLike", userId, id));
             }
             log.info("FilmService: удален Like от User с ID {} фильму с ID {}", userId, id);
             return film;
         } catch (DAOException e) {
             log.error("FilmService: Фильма с id {} не существует в DAO слое при removeLike", id);
-            throw new ServiceException(String.format(
+            throw new NotFoundException(String.format(
                     "FilmService: Фильма с id %d не существует в DAO слое при removeLike в DAO", id), e);
         }
     }
@@ -58,7 +63,7 @@ public class FilmServiceImpl implements FilmService {
             return film;
         } catch (DAOException e) {
             log.error("FilmService: Фильма с id {} или User с ID {} не существует в DAO слое при addLike", id, userId);
-            throw new ServiceException(String.format(
+            throw new NotFoundException(String.format(
                     "FilmService: Фильма с id %d или User с ID %d не существует в DAO слое при addLike в DAO", id, userId), e);
         }
     }
@@ -72,7 +77,7 @@ public class FilmServiceImpl implements FilmService {
             return film;
         } catch (DAOException e) {
             log.error("Фильма с id {} не существует в DAO слое", id);
-            throw new ServiceException(String.format("Фильма с id %d не существует в DAO слое", id), e);
+            throw new NotFoundException(String.format("Фильма с id %d не существует в DAO слое", id), e);
         }
     }
 
@@ -101,7 +106,7 @@ public class FilmServiceImpl implements FilmService {
             return updated;
         } catch (DAOException e) {
             log.error("Фильма с id {} не существует в DAO слое", film.getId());
-            throw new ServiceException((String.format("Фильма с id %s не существует", film.getId())), e);
+            throw new NotFoundException((String.format("Фильма с id %s не существует", film.getId())), e);
         }
     }
 }

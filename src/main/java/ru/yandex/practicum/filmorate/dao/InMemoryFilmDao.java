@@ -3,44 +3,26 @@ package ru.yandex.practicum.filmorate.dao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.dao.mock.InMemoryFilmRepository;
 import ru.yandex.practicum.filmorate.entity.Film;
 import ru.yandex.practicum.filmorate.exception.DAOException;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class InMemoryFilmDao implements FilmDao {
-    private final InMemoryFilmRepository repository;
-
-    @Override
-    public List<Film> getPopular(int count) {
-        log.info("FilmDao: запрос на получение популярных фильмов");
-        //Не уверен, что это лучшее решение - тащить все фильмы из БД, чтобы выбрать 10 лучших
-        //Но по идее логики в БД не должно быть, должен из DAO приходить правильный запрос
-        //Отбор записей я поместил в DAO, потому что это работа DAO слоя - работать с данными из БД
-        List<Film> films = getAll()
-                .stream()
-                .sorted(((o1, o2) -> o2.getUsersLike().size() - o1.getUsersLike().size()))
-                .limit(count)
-                .collect(Collectors.toList());
-        log.info("FilmDao: получены популярные фильмы");
-        return films;
-    }
+    private final Map<Long, Film> storage = new HashMap<>();
+    private long generatorId = 1;
 
     @Override
     public Film getById(long id) {
         log.info("Запрос на получение фильма с ID {} в DAO", id);
-        Optional<Film> optional = repository.getFilmById(id);
-        if (optional.isEmpty()) {
+        Film film = storage.get(id);
+        if (film == null) {
             log.error("Фильма с id {} не существует в Storage", id);
             throw new DAOException(String.format("Фильма с id %s не существует в Storage", id));
         }
-        Film film = optional.get();
         log.info("Получен фильм{} в DAO", film);
         return film;
     }
@@ -48,7 +30,7 @@ public class InMemoryFilmDao implements FilmDao {
     @Override
     public List<Film> getAll() {
         log.info("FilmDao: запрос на получение всех фильмов из DAO");
-        List<Film> films = repository.getAllFilms();
+        List<Film> films = new ArrayList<>(storage.values());
         log.info("Список фильмов получен из DAO");
         return films;
     }
@@ -56,21 +38,25 @@ public class InMemoryFilmDao implements FilmDao {
     @Override
     public Film create(final Film film) {
         log.info("Фильм {} создается в DAO", film);
-        Film created = repository.createFilm(film);
-        log.info("Фильм {} создан в DAO", created);
-        return created;
+        film.setId(generatorId++);
+        film.setUsersLike(new HashSet<>());//И тут тоже не знаю как по-другому сделать
+        storage.put(film.getId(), film);
+        log.info("Фильм {} создан в DAO", film);
+        return film;
     }
 
     @Override
     public Film update(final Film film) {
         log.info("Фильм {} обновляется в DAO", film);
-        Optional<Film> optional = repository.updateFilm(film);
-        if (optional.isEmpty()) {
+        if (!storage.containsKey(film.getId())) {
             log.error("Фильма с id {} не существует в Storage", film.getId());
             throw new DAOException(String.format("Фильма с id %s не существует в Storage", film.getId()));
         }
-        Film updated = optional.get();
-        log.info("Фильм {} обновлен в DAO", updated);
-        return updated;
+        if(film.getUsersLike() == null){//То же самое, что и с друзьями в User. Это глупо, но я не знаю как иначе
+            film.setUsersLike(new HashSet<>());
+        }
+        storage.put(film.getId(), film);
+        log.info("Фильм {} обновлен в DAO", film);
+        return film;
     }
 }
