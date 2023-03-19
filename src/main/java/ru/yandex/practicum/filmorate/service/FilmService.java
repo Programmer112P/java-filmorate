@@ -6,6 +6,14 @@ import java.util.List;
 
 public interface FilmService {
 
+    List<Film> getPopular(int count);
+
+    Film removeLike(long id, long userId);
+
+    Film addLike(long id, long userId);
+
+    Film getById(long id);
+
     List<Film> getAll();
 
     Film create(final Film film);
