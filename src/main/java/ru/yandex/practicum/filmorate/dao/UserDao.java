@@ -16,6 +16,7 @@ public interface UserDao {
     //update
     User update(final User user);
 
+    List<User> getListOfIds(List<Long> ids);
     //delete
     //...
 }

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,22 +12,26 @@ import java.util.Set;
 
 @Data
 @Builder
+@EqualsAndHashCode(of = "id")
 public class User {
-    @EqualsAndHashCode.Exclude
-    private final Set<Long> friends;
-    @EqualsAndHashCode.Include
+    @JsonIgnore// Когда приходит новый пользователь с null, null в поле и устанавливается
+    private Set<Long> friends;
     private long id;
     @Email
     @NotBlank
-    @EqualsAndHashCode.Exclude
     private String email;
     @NotBlank
     @NoSpaces
-    @EqualsAndHashCode.Exclude
     private String login;
-    @EqualsAndHashCode.Exclude
     private String name;
     @PastOrPresent
-    @EqualsAndHashCode.Exclude
     private LocalDate birthday;
+
+    public boolean addFriend(long friendId) {
+        return friends.add(friendId);
+    }
+
+    public boolean removeFriend(long friendId) {
+        return friends.remove(friendId);
+    }
 }
