@@ -25,7 +25,7 @@ public class FilmServiceImpl implements FilmService {
         log.info("FilmService: Запрос на getPopular с count = {}", count);
         List<Film> films = getAll()
                 .stream()
-                .sorted(((o1, o2) -> o2.getUsersLike().size() - o1.getUsersLike().size()))
+                .sorted(((o1, o2) -> o2.getRating().size() - o1.getRating().size()))
                 .limit(count)
                 .collect(Collectors.toList());
         log.info("FilmService: получены фильмы от getPopular с count = {}", count);

@@ -15,7 +15,7 @@ import java.util.Set;
 @EqualsAndHashCode(of = "id")
 public class Film {
     @JsonIgnore
-    private Set<Long> usersLike;
+    private Set<Long> rating;
     private long id;
     @NotBlank
     private String name;
@@ -29,10 +29,10 @@ public class Film {
     private long duration;
 
     public boolean addLike(long userId) {
-        return usersLike.add(userId);
+        return rating.add(userId);
     }
 
     public boolean removeLike(long userId) {
-        return usersLike.remove(userId);
+        return rating.remove(userId);
     }
 }
