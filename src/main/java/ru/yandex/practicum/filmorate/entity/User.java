@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -8,15 +8,15 @@ import ru.yandex.practicum.filmorate.validator.NoSpaces;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @Builder
+@AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 public class User {
-    @JsonIgnore// Когда приходит новый пользователь с null, null в поле и устанавливается
-    private Set<Long> friends;
-    private long id;
+    private Long id;
     @Email
     @NotBlank
     private String email;
@@ -27,11 +27,13 @@ public class User {
     @PastOrPresent
     private LocalDate birthday;
 
-    public boolean addFriend(long friendId) {
-        return friends.add(friendId);
-    }
 
-    public boolean removeFriend(long friendId) {
-        return friends.remove(friendId);
+    public Map<String, Object> toMap() {
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("user_email", email);
+        userMap.put("user_login", login);
+        userMap.put("user_name", name);
+        userMap.put("user_birthday", birthday);
+        return userMap;
     }
 }
