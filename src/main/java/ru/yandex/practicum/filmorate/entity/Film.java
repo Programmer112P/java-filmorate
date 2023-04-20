@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,11 +12,13 @@ import java.util.Set;
 
 @Data
 @Builder
+@AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 public class Film {
-    @JsonIgnore
-    private Set<Long> usersLike;
-    private long id;
+    private Set<Genre> genres;
+    private Long id;
+    @NotNull
+    private Mpa mpa;
     @NotBlank
     private String name;
     @Size(max = 200)
@@ -27,12 +29,6 @@ public class Film {
     @Positive
     @NotNull
     private long duration;
+    private double rate;
 
-    public boolean addLike(long userId) {
-        return usersLike.add(userId);
-    }
-
-    public boolean removeLike(long userId) {
-        return usersLike.remove(userId);
-    }
 }

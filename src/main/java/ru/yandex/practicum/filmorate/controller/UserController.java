@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.entity.User;
@@ -12,15 +12,18 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 
-//Логирование занимает больше места, чем сама логика, может добавить LogBook?
 @Slf4j
 @RestController
 @Validated
 @RequestMapping("/users")
-@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
+
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping()
     public List<User> getAllUsers() {
@@ -56,19 +59,18 @@ public class UserController {
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public User addFriend(@NotNull @PathVariable long id,
+    public void addFriend(@NotNull @PathVariable long id,
                           @NotNull @PathVariable long friendId) {
-        log.info("В UserController addFriend от ID {} на добавление друга с ID {}", id, friendId);
-        return userService.addFriend(id, friendId);
+        log.info("UserController addFriend: запрос от ID {} на добавление друга с ID {}", id, friendId);
+        userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public User removeFriend(@NotNull @PathVariable long id,
+    public void removeFriend(@NotNull @PathVariable long id,
                              @NotNull @PathVariable long friendId) {
-        log.info("В UserController запрос removeFriend от ID {} на удаление друга с ID {}", id, friendId);
-        User user = userService.removeFriend(id, friendId);
-        log.info("В UserController удален у user ID {} друг с ID {}", id, friendId);
-        return user;
+        log.info("UserController removeFriend: запрос от ID {} на удаление друга с ID {}", id, friendId);
+        userService.removeFriend(id, friendId);
+        log.info("UserController removeFriend: удален у user ID {} друг с ID {}", id, friendId);
     }
 
     @PostMapping

@@ -6,11 +6,11 @@ import java.util.List;
 
 public interface FilmService {
 
-    List<Film> getPopular(int count);
+    List<Film> getPopular(int amount);
 
-    Film removeLike(long id, long userId);
+    void removeLike(long filmId, long userId);
 
-    Film addLike(long id, long userId);
+    void addLike(long filmId, long userId);
 
     Film getById(long id);
 
