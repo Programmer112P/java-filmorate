@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dao.FriendsDao;
 import ru.yandex.practicum.filmorate.dao.UserDao;
 import ru.yandex.practicum.filmorate.entity.User;
 import ru.yandex.practicum.filmorate.exception.DAOException;
@@ -16,17 +17,19 @@ import java.util.List;
 @Slf4j
 public class UserServiceImpl implements UserService {
     private final UserDao userDao;
+    private final FriendsDao friendsDao;
 
     @Autowired
-    public UserServiceImpl(@Qualifier("userDaoImpl") UserDao userDao) {
+    public UserServiceImpl(@Qualifier("userDaoImpl") UserDao userDao, FriendsDao friendsDao) {
         this.userDao = userDao;
+        this.friendsDao = friendsDao;
     }
 
     @Override
     public List<User> getCommonFriends(long id, long otherId) {
         log.info("UserService addFriend: Запрос на получение списка общих друзей для user с ID {} и user с ID {}", id, otherId);
         try {
-            List<User> commonFriends = userDao.getCommonFriends(id, otherId);
+            List<User> commonFriends = friendsDao.getCommonFriends(id, otherId);
             log.info("UserService addFriend: Получен список общих друзей для user с ID {} и user с id {} ", id, otherId);
             return commonFriends;
         } catch (DAOException e) {
@@ -40,7 +43,7 @@ public class UserServiceImpl implements UserService {
     public List<User> getFriends(long id) {
         log.info("UserService getFriends: Запрос на получение списка друзей от user с ID {} ", id);
         try {
-            List<User> friendsList = userDao.getFriends(id);
+            List<User> friendsList = friendsDao.getFriends(id);
             log.info("UserService getFriends: Получен список друзей user от с ID {} ", id);
             return friendsList;
         } catch (DAOException e) {
@@ -53,7 +56,7 @@ public class UserServiceImpl implements UserService {
     public void removeFriend(long id, long friendId) {
         log.info("UserService removeFriend: Запрос на удаление друга с ID {} от user с ID {} ", friendId, id);
         try {
-            userDao.removeFriend(id, friendId);
+            friendsDao.removeFriend(id, friendId);
             log.info("UserService removeFriend: Удален друг с ID {} у user с ID {} ", friendId, id);
         } catch (DAOException e) {
             log.error("UserService removeFriend: Ошибка при удалении User с ID {} из друзей User с ID {}", friendId, id);
@@ -65,7 +68,7 @@ public class UserServiceImpl implements UserService {
     public void addFriend(long id, long friendId) {
         log.info("UserService addFriend: Запрос на добавление друга с ID {} от user с ID {} ", friendId, id);
         try {
-            userDao.addFriend(id, friendId);
+            friendsDao.addFriend(id, friendId);
             log.info("UserService addFriend: Добавлен друг от id {} к id {} ", id, friendId);
         } catch (DAOException e) {
             log.error("UserService addFriend: Ошибка при добавлении User с ID {} в друзья к User с ID {}", friendId, id);

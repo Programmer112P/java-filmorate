@@ -6,12 +6,6 @@ import java.util.List;
 
 public interface FilmDao {
 
-    void removeLike(long filmId, long userId);
-
-    void addLike(long filmId, long userId);
-
-    List<Film> getMostPopulars(int amount);
-
     Film getById(long id);
 
     List<Film> getAll();

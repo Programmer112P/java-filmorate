@@ -2,14 +2,12 @@ package ru.yandex.practicum.filmorate.dao.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dao.MpaDao;
 import ru.yandex.practicum.filmorate.entity.Mpa;
 import ru.yandex.practicum.filmorate.exception.DAOException;
-import ru.yandex.practicum.filmorate.exception.DbConnectionException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -37,9 +35,6 @@ public class MpaDaoImpl implements MpaDao {
         } catch (IncorrectResultSizeDataAccessException e) {
             log.error("MpaDao getById: Не существует mpa с id {}", id);
             throw new DAOException(e.getMessage(), e);
-        } catch (DataAccessException e) {
-            log.error("MpaDao getById: Ошибка при выполнении запроса {} с id {}", sql, id);
-            throw new DbConnectionException(e.getMessage(), e);
         }
     }
 
@@ -47,20 +42,15 @@ public class MpaDaoImpl implements MpaDao {
     public List<Mpa> getAll() {
         log.info("MpaDao getAll: Запрос на получение всех mpa");
         String sql = "SELECT * FROM mpa;";
-        try {
-            List<Mpa> mpas = jdbcTemplate.query(sql, this::mapRowToMpa);
-            log.info("MpaDao getAll: Получены все mpa");
-            return mpas;
-        } catch (DataAccessException e) {
-            log.error("MpaDao getAll: Ошибка при выполнении запроса {}", sql);
-            throw new DbConnectionException(e.getMessage(), e);
-        }
+        List<Mpa> mpas = jdbcTemplate.query(sql, this::mapRowToMpa);
+        log.info("MpaDao getAll: Получены все mpa");
+        return mpas;
     }
 
     private Mpa mapRowToMpa(ResultSet rs, int rowNum) throws SQLException {
         return Mpa.builder()
                 .id(rs.getLong("mpa_id"))
-                .name(rs.getString("mpa_name"))
+                .name(rs.getString("name"))
                 .build();
     }
 }

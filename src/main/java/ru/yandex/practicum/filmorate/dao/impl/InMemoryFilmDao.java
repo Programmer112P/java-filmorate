@@ -17,19 +17,6 @@ public class InMemoryFilmDao implements FilmDao {
     private long generatorId = 1;
 
     @Override
-    public void removeLike(long filmId, long userId) {
-    }
-
-    @Override
-    public void addLike(long filmId, long userId) {
-    }
-
-    @Override
-    public List<Film> getMostPopulars(int amount) {
-        return null;
-    }
-
-    @Override
     public Film getById(long id) {
         log.info("Запрос на получение фильма с ID {} в DAO", id);
         Film film = storage.get(id);
@@ -53,7 +40,6 @@ public class InMemoryFilmDao implements FilmDao {
     public Film create(final Film film) {
         log.info("Фильм {} создается в DAO", film);
         film.setId(generatorId++);
-        //film.setUsersLike(new HashSet<>());//И тут тоже не знаю как по-другому сделать
         storage.put(film.getId(), film);
         log.info("Фильм {} создан в DAO", film);
         return film;
@@ -66,9 +52,6 @@ public class InMemoryFilmDao implements FilmDao {
             log.error("Фильма с id {} не существует в Storage", film.getId());
             throw new DAOException(String.format("Фильма с id %s не существует в Storage", film.getId()));
         }
-//        if(film.getUsersLike() == null){//То же самое, что и с друзьями в User. Это глупо, но я не знаю как иначе
-//            film.setUsersLike(new HashSet<>());
-//        }
         storage.put(film.getId(), film);
         log.info("Фильм {} обновлен в DAO", film);
         return film;

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.FilmDao;
+import ru.yandex.practicum.filmorate.dao.LikeDao;
 import ru.yandex.practicum.filmorate.entity.Film;
 import ru.yandex.practicum.filmorate.exception.DAOException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -16,16 +17,18 @@ import java.util.List;
 @Service
 public class FilmServiceImpl implements FilmService {
     private final FilmDao filmDao;
+    private final LikeDao likeDao;
 
     @Autowired
-    public FilmServiceImpl(@Qualifier("filmDaoImpl") FilmDao filmDao) {
+    public FilmServiceImpl(@Qualifier("filmDaoImpl") FilmDao filmDao, LikeDao likeDao) {
         this.filmDao = filmDao;
+        this.likeDao = likeDao;
     }
 
     @Override
     public List<Film> getPopular(int amount) {
         log.info("FilmService getPopular: Запрос c количеством = {}", amount);
-        List<Film> films = filmDao.getMostPopulars(amount);
+        List<Film> films = likeDao.getMostPopular(amount);
         log.info("FilmService getPopular: получены фильмы количеством {}", amount);
         return films;
     }
@@ -34,7 +37,7 @@ public class FilmServiceImpl implements FilmService {
     public void removeLike(long filmId, long userId) {
         log.info("FilmService removeLike: от User с ID {} фильму с ID {}", userId, filmId);
         try {
-            filmDao.removeLike(filmId, userId);
+            likeDao.removeLike(filmId, userId);
             log.info("FilmService: удален Like от User с ID {} фильму с ID {}", userId, filmId);
         } catch (DAOException e) {
             log.error("FilmService removeLike: Фильма с id {} не существует", filmId);
@@ -47,7 +50,7 @@ public class FilmServiceImpl implements FilmService {
     public void addLike(long filmId, long userId) {
         log.info("FilmService: Запрос на addLike от User с ID {} фильму с ID {}", userId, filmId);
         try {
-            filmDao.addLike(filmId, userId);
+            likeDao.addLike(filmId, userId);
             log.info("FilmService: like от User с ID {} поставлен фильму с ID {}", userId, filmId);
         } catch (DAOException e) {
             log.error("FilmService addLike: Фильма с id {} или User с ID {} не существует ", filmId, userId);

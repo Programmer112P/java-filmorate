@@ -7,7 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.dao.impl.FilmDaoImpl;
 import ru.yandex.practicum.filmorate.dao.impl.GenreDaoImpl;
-import ru.yandex.practicum.filmorate.dao.insert.FilmSimpleJdbcInsert;
+import ru.yandex.practicum.filmorate.dao.impl.mapper.FilmRowMapper;
 import ru.yandex.practicum.filmorate.entity.Film;
 import ru.yandex.practicum.filmorate.entity.Genre;
 import ru.yandex.practicum.filmorate.entity.Mpa;
@@ -25,10 +25,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @Sql({"/testschema.sql", "/testdata.sql"})
 class FilmDaoTest {
 
+    private final FilmRowMapper filmRowMapper;
     private final JdbcTemplate jdbcTemplate;
     private final FilmDao filmDao;
     private final GenreDao genreDao;
-    private final FilmSimpleJdbcInsert filmSimpleJdbcInsert;
     private Mpa mpa;
     private Genre genreOne;
     private Genre genreTwo;
@@ -38,9 +38,9 @@ class FilmDaoTest {
     @Autowired
     public FilmDaoTest(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        filmSimpleJdbcInsert = new FilmSimpleJdbcInsert(jdbcTemplate);
         genreDao = new GenreDaoImpl(jdbcTemplate);
-        filmDao = new FilmDaoImpl(genreDao, jdbcTemplate, filmSimpleJdbcInsert);
+        this.filmRowMapper = new FilmRowMapper(genreDao);
+        filmDao = new FilmDaoImpl(jdbcTemplate, filmRowMapper);
         mpa = Mpa.builder().id(1L).build();
         genreOne = Genre.builder().id(1L).name("Комедия").build();
         genreTwo = Genre.builder().id(2L).name("Драма").build();
@@ -51,51 +51,6 @@ class FilmDaoTest {
                 .genres(Set.of(genreOne, genreTwo)).build();
     }
 
-    @Test
-    void removeLike_shouldRemoveLikeIfFilmAndUserExist() {
-        filmDao.create(testFilm);
-        filmDao.addLike(2, 1);
-        filmDao.addLike(2, 2);
-        List<Film> mostPopular = filmDao.getMostPopulars(1);
-        assertThat(mostPopular.get(0).getId()).isEqualTo(2);
-        filmDao.removeLike(2, 1);
-        filmDao.removeLike(2, 2);
-        mostPopular = filmDao.getMostPopulars(1);
-        assertThat(mostPopular.get(0).getId()).isEqualTo(1);
-    }
-
-    @Test
-    void removeLike_shouldThrowExceptionIfUserOrFilmNotExist() {
-        assertThrows(DAOException.class, () -> filmDao.removeLike(44, 1));
-        assertThrows(DAOException.class, () -> filmDao.removeLike(1, 44));
-    }
-
-    @Test
-    void addLike_shouldAddLikeIfUserAndFilmExist() {
-        filmDao.create(testFilm);
-        System.out.println(filmDao.getAll());
-        filmDao.addLike(2, 1);
-        filmDao.addLike(2, 2);
-        List<Film> mostPopular = filmDao.getMostPopulars(1);
-        assertThat(mostPopular.get(0).getId()).isEqualTo(2);
-    }
-
-    @Test
-    void addLike_shouldThrowExceptionIfUserOrFilmNotExist() {
-        assertThrows(DAOException.class, () -> filmDao.addLike(44, 1));
-        assertThrows(DAOException.class, () -> filmDao.addLike(1, 44));
-    }
-
-    @Test
-    void getMostPopulars() {
-        List<Film> films = filmDao.getMostPopulars(10);
-        assertThat(films.size()).isEqualTo(1);
-        filmDao.create(testFilm);
-        filmDao.addLike(2, 1);
-        filmDao.addLike(2, 2);
-        List<Film> mostPopular = filmDao.getMostPopulars(10);
-        assertThat(mostPopular.get(0).getId()).isEqualTo(2);
-    }
 
     @Test
     void getById_shouldReturnFilmById() {

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.errorHandler;
+package ru.yandex.practicum.filmorate.errorhandler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -6,7 +6,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.yandex.practicum.filmorate.exception.DbConnectionException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 
 import javax.validation.ConstraintViolationException;
@@ -28,13 +27,6 @@ public class ErrorHandler {
     public ErrorResponse handleConstraintViolationException(final ConstraintViolationException e) {
         log.error("400 {}", e.getMessage());
         return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler(DbConnectionException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleDbConnectionException(final DbConnectionException e) {
-        log.error("500 {}", e.getMessage());
-        return new ErrorResponse("Произошла ошибка с доступом к серверу базы данных");
     }
 
     @ExceptionHandler(NotFoundException.class)

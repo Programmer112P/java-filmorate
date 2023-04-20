@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.errorHandler;
+package ru.yandex.practicum.filmorate.errorhandler;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

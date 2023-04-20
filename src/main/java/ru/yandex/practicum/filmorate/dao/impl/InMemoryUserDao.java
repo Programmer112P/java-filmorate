@@ -44,9 +44,6 @@ public class InMemoryUserDao implements UserDao {
             log.error("User с id {} не существует в репозитории", user.getId());
             throw new DAOException(String.format("User с id %s не существует в репозитории", user.getId()));
         }
-        //if (user.getFriends() == null){//Через костыль. Когда приходит json с null - обнуляется поле friends
-      //      user.setFriends(new HashSet<>());
-        //}
         storage.put(user.getId(), user);
         log.info("User {} обновлен в DAO", user);
         return user;
@@ -64,21 +61,4 @@ public class InMemoryUserDao implements UserDao {
         return user;
     }
 
-    @Override
-    public List<User> getCommonFriends(long id, long otherId) {
-        return null;
-    }
-
-    @Override
-    public List<User> getFriends(long id) {
-        return null;
-    }
-
-    @Override
-    public void removeFriend(long id, long friendId) {
-    }
-
-    @Override
-    public void addFriend(long id, long friendId) {
-    }
 }
